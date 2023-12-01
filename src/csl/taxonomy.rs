@@ -305,6 +305,11 @@ impl EntryLike for Entry {
             }
             StandardVariable::Publisher => entry
                 .map(|e| e.publisher())
+                .or_else(|| {
+                    entry
+                        .bound_select(&select!(* > ("p":Repository)), "p")
+                        .and_then(Entry::title)
+                })
                 .map(|f| f.select(form))
                 .map(Cow::Borrowed),
             StandardVariable::PublisherPlace => entry
